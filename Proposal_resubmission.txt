@@ -1,0 +1,59 @@
+SI 507 Final Project Proposal Resubmission
+Pokuan Ho 35499722
+
+========================================================================
+Summary:
+
+I plan to build a program that lets user choose an NBA player (has to be a valid name spelled correctly) and shows:
+ - Player injury history (In the form of an infographic like annotated dots on a full body graphic)
+
+
+# The following are removed because I might not be able to address them all, but kept for reference (or good ideas for later)
+1) Their team history (which will show up on the US MAP using Plotly)
+2) Their injury history (I will need to see if it's possible to create a human body heatmap, but if not, probably a line graph)
+3) Their stats history by season, which will require user to decide a type beforehand (Points Scored, Block Shots, etc.)
+4) (If first 3 are completed with no complications) Their most recent news (injury updates, trade news, etc.)
+
+========================================================================
+Data Source:
+
+FOX SPORTS Webpage (Has to crawl multiple pages in a site I haven't used before) - 8 points
+Link: https://www.foxsports.com/nba
+An couple examples of pages to be crawled:
+https://www.foxsports.com/nba/terry-rozier-player-stats
+https://www.foxsports.com/nba/terry-rozier-player-injuries
+
+# Removed: FOX SPORTS API only provide news, no injury reports
+(If Doing 4) FOX SPORTS API (https://newsapi.org/s/fox-sports-api) - haven't used before, requires API key - 4 Points
+
+There are currently over 300 active players in the NBA and I would have to scrape all those records, so it should fulfill the requirement of capturing at least 100 records.
+
+========================================================================
+Data Access and Storage:
+
+I plan to have a SQLite database that will store several related tables for me (one for player, one for team, one for injury)
+Since I'm going to scrape multiple pages, I will cache the HTML, though the resulting cache (over 300 pages) will probably be quite huge.
+
+========================================================================
+Data Processing:
+
+I will use user input to generate SQL queries to gather data,
+and pass those data to plotly so results show up in nice graphics.
+
+========================================================================
+Presentation Options:
+
+Users will be able to choose whether they want to see data just in text (which will be nicely formatted), or whether they want to see it in plotly.
+I might also include an option that let users export the data they want to see so they don't have to run the program everytime to get the data.
+As mentioned in the summary, the type of data that will be displayed are:
+ - Player injury history (In the form of an infographic like annotated dots on a full body graphic)
+
+========================================================================
+Presentation tools:
+
+For text based data, it will be presented in the commandline (or I will include an option to export the data into a txt or csv)
+For graphical data, I will utilize Plotly which will generate a nicely formatted graphics very quickly.
+ - One for Injury History (See if a Human Graph is possible, like a much less glamorous version of this http://i.imgur.com/5Xiq1C2.jpg)
+ - I have already found a good picture that could be used as the backgroud https://userscontent2.emaze.com/images/0e8ac80a-9117-45a0-b503-41d01ee8ddfa/cefc4149-a2d4-4432-b328-e4c1b3fd0a7a.jpg
+
+Depending on how the project goes, I may consider porting this to a web based interface (because it'd be cool to have a page that shows a graphical representation of any player's injury over the years, which I don't see that exist yet)
