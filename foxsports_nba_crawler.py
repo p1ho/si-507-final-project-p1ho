@@ -6,6 +6,16 @@ from datetime import datetime
 import time
 import re
 
+OUTPUT_NAME = 'nba_player_injuries.json'
+CACHE_NAME = 'foxsports_nba_cache.json'
+MAX_STALENESS = 604800 # Have to Refetch Every Week
+try:
+    CACHE = open(CACHE_NAME, 'r')
+    CACHE_DICT = json.loads(CACHE.read())
+    CACHE.close()
+except:
+    CACHE_DICT = {}
+
 # Debug logger
 DEBUG = True
 def log(msg):
@@ -26,7 +36,9 @@ def uniq_ident(url, params):
     return ident_string
 
 # Request with Caching
-# I made it so it opens and closes cache within the function so the requests made by nps_test is saved.
+# The data returned by the request is first cached, the cached data is then returned
+# Parameters: url, cache dictionary, optional header, optional params, delay before request (to prevent server from blocking)
+# returns: fetched data in whatever format it came in
 def request_with_cache(url, CACHE_DICT, header = {}, params = {}, delay = .5):
     log('------------------------')
     time.sleep(delay)
@@ -57,6 +69,8 @@ def request_with_cache(url, CACHE_DICT, header = {}, params = {}, delay = .5):
 # Function that returns a dictionary with injury data of all nba players
 # It is a multi level dictionary: Team --> Player --> Injury
 # All tha pages will be cached
+# Parameter: cache dictionary
+# returns: dictionary containing all nba_player_injuries
 def get_nba_player_injuries(CACHE_DICT):
     #### Implement your function here ####
     # Get First Page
@@ -65,6 +79,7 @@ def get_nba_player_injuries(CACHE_DICT):
     baseurl = 'https://www.foxsports.com'
     url_addon = '/nba/teams'
     page_soup = BeautifulSoup(request_with_cache(baseurl+url_addon, CACHE_DICT), 'html.parser')
+    print("Entered Main Fox Sports Page")
     team_names = [team.text.strip().replace('\n', ' ') for team in page_soup.find_all(class_="wisbb_fullTeamStacked")]
     team_ls = page_soup.find_all("a", href=re.compile("team-roster"))
     counter = 0
@@ -74,12 +89,13 @@ def get_nba_player_injuries(CACHE_DICT):
         counter += 1
         url_addon = team['href']
         page_soup = BeautifulSoup(request_with_cache(baseurl+url_addon, CACHE_DICT), 'html.parser')
+        print("Entered Team {}'s Page".format(team_name))
         player_ls = page_soup.find_all(class_="wisbb_fullPlayer")
         for player in player_ls:
-            full_name = player.find("span").text
-            nba_player_injuries[team_name][full_name] = []
             url_addon = player['href'].replace('stats', 'injuries')
             page_soup = BeautifulSoup(request_with_cache(baseurl+url_addon, CACHE_DICT), 'html.parser')
+            full_name = "{} {}".format(page_soup.find(class_="wisbb_firstName").text, page_soup.find(class_="wisbb_lastName").text)
+            nba_player_injuries[team_name][full_name] = []
             try:
                 injury_table = page_soup.find(class_="wisbb_injuriesTable").find("tbody")
                 injuries = injury_table.find_all(class_="wisbb_fvStand")
@@ -97,15 +113,6 @@ def get_nba_player_injuries(CACHE_DICT):
     return nba_player_injuries
    
 if __name__=="__main__":
-    OUTPUT_NAME = 'nba_player_injuries.json'
-    CACHE_NAME = 'foxsports_nba_cache.json'
-    MAX_STALENESS = 604800 # Have to Refetch Every Week
-    try:
-        CACHE = open(CACHE_NAME, 'r')
-        CACHE_DICT = json.loads(CACHE.read())
-        CACHE.close()
-    except:
-        CACHE_DICT = {}
     returned_dict = get_nba_player_injuries(CACHE_DICT)
     log('------------------------')
     log('Outputting JSON File...')
