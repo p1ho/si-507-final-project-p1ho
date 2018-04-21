@@ -1,3 +1,4 @@
 secrets.py
 foxsports_nba_cache.json
 instructions.pdf
+__pycache__
